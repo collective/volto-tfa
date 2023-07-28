@@ -131,8 +131,8 @@ const AddTFA = ({ onChallenge, otpChallenge, intl }) => {
             </Form>
           </Segment>
         </Segment.Group>
-        <pre>{otpChallenge.qr_code}</pre>
-        <pre>{JSON.stringify(otpChallenge)}</pre>
+        {/* <pre>{otpChallenge.qr_code}</pre>
+        <pre>{JSON.stringify(otpChallenge)}</pre> */}
       </Container>
     </div>
   );
