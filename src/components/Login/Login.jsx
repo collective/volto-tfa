@@ -100,6 +100,7 @@ const AddTFA = ({ onChallenge, otpChallenge, intl }) => {
                     </Grid.Column>
                     <Grid.Column width="8">
                       {/* eslint-disable jsx-a11y/no-autofocus */}
+                      {/* TODO: https://dominicarrojado.com/posts/how-to-create-your-own-otp-input-in-react-and-typescript-with-tests-part-1/ */}
                       <Input
                         id="otp"
                         name="otp"

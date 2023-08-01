@@ -46,7 +46,6 @@ export const QRCodeWidget = ({
             size={200}
             value={`otpauth://totp/${userId}@${window.location.hostname}?secret=${secret}`}
           />
-          <pre>{secret}</pre>
           <input
             type="hidden"
             value={secret}

@@ -90,6 +90,7 @@ class Preferences extends Component {
             mode: 'hidden',
             widget: 'qrcode_otp_widget',
           },
+          // TODO: add custom widget https://dominicarrojado.com/posts/how-to-create-your-own-otp-input-in-react-and-typescript-with-tests-part-1/
           two_factor_authentication_otp: {
             description: 'Enter OTP',
             factory: 'Text line (String)',
