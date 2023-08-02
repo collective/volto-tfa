@@ -1,12 +1,10 @@
-import React, { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Form } from 'semantic-ui-react';
-import { injectIntl } from 'react-intl';
 import { QRCodeSVG } from 'qrcode.react';
 import { encode } from 'hi-base32';
-import { FormFieldWrapper } from '@plone/volto/components';
 import jwtDecode from 'jwt-decode';
-import { connect } from 'react-redux';
-import { compose } from 'redux';
+import { useSelector } from 'react-redux';
+import { FormFieldWrapper } from '@plone/volto/components';
 
 export const QRCodeWidget = ({
   id,
@@ -18,10 +16,11 @@ export const QRCodeWidget = ({
   onChange,
   onEdit,
   onDelete,
-  intl,
-  userId,
 }) => {
-  const [secret, setSecret] = React.useState();
+  const userId = useSelector((state) =>
+    state.userSession.token ? jwtDecode(state.userSession.token).sub : '',
+  );
+  const [secret, setSecret] = useState();
 
   useEffect(() => {
     const secret = encode(Math.random().toString(36))
@@ -39,7 +38,7 @@ export const QRCodeWidget = ({
     >
       <FormFieldWrapper id={id} description={description}>
         <div>
-          {/* TODO: user + domain + issuer 
+          {/* TODO: user + domain + issuer
             oppure fare generare il valore del qr code dal server
         */}
           <QRCodeSVG
@@ -59,11 +58,4 @@ export const QRCodeWidget = ({
   );
 };
 
-export default compose(
-  injectIntl,
-  connect((state, props) => ({
-    userId: state.userSession.token
-      ? jwtDecode(state.userSession.token).sub
-      : '',
-  })),
-)(QRCodeWidget);
+export default QRCodeWidget;

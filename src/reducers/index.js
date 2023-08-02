@@ -1,5 +1,6 @@
 import { LOGIN } from '@plone/volto/constants/ActionTypes';
 import { OTP_CHALLENGE_CANCEL } from '../actions';
+
 const initialState = {
   loading: false,
   login: null,
@@ -32,15 +33,7 @@ function otpChallenge(state = initialState, action = {}) {
         loading: false,
       };
     case OTP_CHALLENGE_CANCEL:
-      return {
-        ...state,
-        loading: false,
-        login: null,
-        type: null,
-        action: null,
-        qr_code: null,
-        signature: null,
-      };
+      return { ...initialState };
     default:
       return state;
   }

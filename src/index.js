@@ -1,13 +1,11 @@
-import TFALogin from './components/Login/Login';
+import TFALogin from '@plone-collective/volto-tfa/components/Login/Login';
 import TFAPreferences, {
   Pluggables,
-} from './components/Preferences/Preferences';
+} from '@plone-collective/volto-tfa/components/Preferences/Preferences';
 
-import QRCodeWidget from './components/Preferences/QRCodeWidget';
+import QRCodeWidget from '@plone-collective/volto-tfa/components/Preferences/QRCodeWidget';
 
-// import { Login } from '@plone/volto/components';
-import otpChallenge from './reducers';
-// import StandardWrapper from '@plone/volto/components/manage/Toolbar/StandardWrapper';
+import otpChallenge from '@plone-collective/volto-tfa/reducers';
 
 const applyConfig = (config) => {
   config.addonReducers = {
@@ -30,6 +28,10 @@ const applyConfig = (config) => {
       exact: true,
     },
   ];
+  config.settings.nonContentRoutes = [
+    ...config.settings.nonContentRoutes,
+    '/tfa-preferences',
+  ];
 
   // https://maurits.vanrees.org/weblog/archive/2021/11/tiberiu-ichim-volto-pluggables
   // https://github.com/plone/volto/issues/3040
@@ -40,16 +42,6 @@ const applyConfig = (config) => {
       component: Pluggables,
     },
   ];
-
-  // config.settings.additionalToolbarComponents = {
-  //   ...(config.settings.additionalToolbarComponents || {}),
-  //   tfa_preferences: {
-  //     component: TFAPreferences,
-  //     wrapper: StandardWrapper,
-  //     wrapperTitle: messages.tfaPreferences,
-  //     hideToolbarBody: true,
-  //   },
-  // };
 
   if (config.widgets?.widget) {
     config.widgets.widget.qrcode_otp_widget = QRCodeWidget;
