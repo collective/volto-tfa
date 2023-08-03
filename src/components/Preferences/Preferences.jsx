@@ -1,24 +1,16 @@
-import { getUser, updateUser } from '@plone/volto/actions';
-import { Form, Icon, Toast } from '@plone/volto/components';
-
-import { Plug } from '@plone/volto/components/manage/Pluggable';
-import { messages } from '@plone/volto/helpers';
-import rightArrowSVG from '@plone/volto/icons/right-key.svg';
+import { useEffect, useState } from 'react';
 import jwtDecode from 'jwt-decode';
 import PropTypes from 'prop-types';
-import React, { Component } from 'react';
-import { FormattedMessage, injectIntl } from 'react-intl';
-import { connect } from 'react-redux';
-import { Link, withRouter } from 'react-router-dom';
-import { toast } from 'react-toastify';
-import { compose } from 'redux';
+import { FormattedMessage, useIntl } from 'react-intl';
+import { useDispatch, useSelector } from 'react-redux';
+import { Link, useHistory } from 'react-router-dom';
 import { Container, Segment } from 'semantic-ui-react';
-// const messages = defineMessages({
-//     tfaPreferences: {
-//     id: 'tfaPreferences',
-//     defaultMessage: 'OTP preferences',
-//   },
-// });
+import { getUser, updateUser } from '@plone/volto/actions';
+import { Form, Icon, Toast } from '@plone/volto/components';
+import { Plug } from '@plone/volto/components/manage/Pluggable';
+import { injectLazyLibs } from '@plone/volto/helpers/Loadable/Loadable';
+import { schemaFactory } from '@plone-collective/volto-tfa/components/Preferences/schemaFactory';
+import rightArrowSVG from '@plone/volto/icons/right-key.svg';
 
 export const Pluggables = () => {
   return (
@@ -40,142 +32,45 @@ export const Pluggables = () => {
   );
 };
 
-class Preferences extends Component {
-  static propTypes = {
-    user: PropTypes.shape({
-      fullname: PropTypes.string,
-      email: PropTypes.string,
-      home_page: PropTypes.string,
-      location: PropTypes.string,
-    }).isRequired,
-    updateUser: PropTypes.func.isRequired,
-    getUser: PropTypes.func.isRequired,
-    userId: PropTypes.string.isRequired,
-    loaded: PropTypes.bool.isRequired,
-    loading: PropTypes.bool,
-    closeMenu: PropTypes.func,
-  };
+function Preferences({ closeMenu, toastify }) {
+  const intl = useIntl();
+  const dispatch = useDispatch();
+  const history = useHistory();
+  const { toast } = toastify;
 
-  //   const [showQrcode, setShowQrcode] = useState('');
+  const user = useSelector((state) => state.users.user);
+  const userId = useSelector((state) =>
+    state.userSession.token ? jwtDecode(state.userSession.token).sub : '',
+  );
+  const updated = useSelector((state) => state.users.update.loaded);
+  const updating = useSelector((state) => state.users.update.loading);
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      showQrcode: false,
-      schema: {
-        fieldsets: [
-          {
-            behavior: 'plone',
-            fields: [
-              'two_factor_authentication_enabled',
-              'two_factor_authentication_secret',
-              'two_factor_authentication_otp',
-            ],
-            id: 'default',
-            title: 'Default',
-          },
-        ],
-        properties: {
-          two_factor_authentication_enabled: {
-            description:
-              'To configure Two-Factor Authentication (2FA), you should link your account and the authentication app on your mobile device.',
-            factory: 'Yes/No',
-            title: 'Two Factor Authentication',
-            type: 'boolean',
-          },
-          two_factor_authentication_secret: {
-            title: 'Secret',
-            description: 'Scan this QR code with your OTP app.',
-            type: 'string',
-            mode: 'hidden',
-            widget: 'qrcode_otp_widget',
-          },
-          // TODO: add custom widget https://dominicarrojado.com/posts/how-to-create-your-own-otp-input-in-react-and-typescript-with-tests-part-1/
-          two_factor_authentication_otp: {
-            description: 'Enter OTP',
-            factory: 'Text line (String)',
-            title: 'OTP',
-            mode: 'hidden',
-          },
-        },
-        required: [],
-        type: 'object',
-      },
-    };
-    this.onCancel = this.onCancel.bind(this);
-    this.onSubmit = this.onSubmit.bind(this);
-  }
+  const [enabled, setEnabled] = useState(false);
 
-  componentDidMount() {
-    this.props.getUser(this.props.userId);
-  }
+  useEffect(() => {
+    dispatch(getUser(userId));
+  }, [dispatch, userId]);
 
-  componentDidUpdate(prevProps) {
-    if (!prevProps.updated && this.props.updated) {
+  useEffect(() => {
+    if (updated) {
       toast.success(
         <Toast
           success
-          title={this.props.intl.formatMessage(messages.success)}
-          content={this.props.intl.formatMessage(messages.saved)}
+          title={intl.formatMessage({ id: 'Success' })}
+          content={intl.formatMessage({ id: 'Saved' })}
         />,
       );
-      if (this.props.closeMenu) this.props.closeMenu();
-      else this.props.history.goBack();
+      if (closeMenu) closeMenu();
+      else history.goBack();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [updated]);
+
+  function onChangeFormData(data) {
+    setEnabled(!!data.two_factor_authentication_enabled);
   }
 
-  onChangeFormData = (data) => {
-    if (data.two_factor_authentication_enabled) {
-      this.setState({
-        showQrcode: true,
-        schema: {
-          ...this.state.schema,
-          properties: {
-            ...this.state.schema.properties,
-            two_factor_authentication_secret: {
-              ...this.state.schema.properties.two_factor_authentication_secret,
-              mode: 'edit',
-            },
-            two_factor_authentication_otp: {
-              ...this.state.schema.properties.two_factor_authentication_otp,
-              mode: 'edit',
-            },
-          },
-          required: [
-            // 'two_factor_authentication_secret',
-            'two_factor_authentication_otp',
-          ],
-        },
-      });
-    } else {
-      this.setState({
-        showQrcode: false,
-        schema: {
-          ...this.state.schema,
-          properties: {
-            ...this.state.schema.properties,
-            two_factor_authentication_secret: {
-              ...this.state.schema.properties.two_factor_authentication_secret,
-              mode: 'hidden',
-            },
-            two_factor_authentication_otp: {
-              ...this.state.schema.properties.two_factor_authentication_otp,
-              mode: 'hidden',
-            },
-          },
-          required: [],
-        },
-      });
-    }
-  };
-
-  /**
-   * Submit handler
-   * @method onSubmit
-   * @param {object} data Form data.
-   * @returns {undefined}
-   */
-  onSubmit(data) {
+  function onSubmit(data) {
     data = Object.fromEntries(
       Object.entries(data)
         .filter(([k, v]) => k.startsWith('two_factor_authentication'))
@@ -187,111 +82,87 @@ class Preferences extends Component {
             : null,
         ]),
     );
-    this.props.updateUser(this.props.userId, data);
+    dispatch(updateUser(userId, data));
   }
 
-  /**
-   * Cancel handler
-   * @method onCancel
-   * @returns {undefined}
-   */
-  onCancel() {
-    if (this.props.closeMenu) this.props.closeMenu();
-    else this.props.history.goBack();
+  function onCancel() {
+    if (closeMenu) closeMenu();
+    else history.goBack();
   }
 
-  /**
-   * Render method.
-   * @method render
-   * @returns {string} Markup for the component.
-   */
-  render() {
-    return this.props?.user?.['@id'] ? (
-      <>
-        <Container>
-          <Segment.Group raised>
-            <Segment>
-              <h2>
-                <FormattedMessage
-                  id="tfa_preferences_title"
-                  defaultMessage="Two Factor Authentication"
-                />
-              </h2>
+  if (!user['@id']) return null;
+
+  return (
+    <>
+      <Container>
+        <Segment.Group raised>
+          <Segment>
+            <h2>
               <FormattedMessage
-                id="tfa_preferences_description"
-                defaultMessage="To configure Two Factor Authentication (2FA), you should link your account and the authentication app on your mobile device."
+                id="tfa_preferences_title"
+                defaultMessage="Two Factor Authentication"
               />
-              <ol>
-                <li>
-                  <FormattedMessage
-                    id="tfa_preferences_step1"
-                    defaultMessage="Enable Two Factor authentication using the checkbox below"
-                  />
-                </li>
-                <li>
-                  <FormattedMessage
-                    id="tfa_preferences_step2"
-                    defaultMessage="Install an OTP app in your mobile device (e.g. Google Authenticator, Microsoft Authenticator, Authy, LastPass Authenticator, ...)"
-                  />
-                </li>
-                <li>
-                  <FormattedMessage
-                    id="tfa_preferences_step3"
-                    defaultMessage="Scan the QR code with your OTP app"
-                  />
-                </li>
-                <li>
-                  <FormattedMessage
-                    id="tfa_preferences_step4"
-                    defaultMessage="Enter the OTP code generated by the app in the OTP field below"
-                  />
-                </li>
-                <li>
-                  <FormattedMessage
-                    id="tfa_preferences_step5"
-                    defaultMessage="Click the confirm button. If the OTP code is correct, 2FA will be enabled. Next time you login, you will be asked for the OTP provided by your app."
-                  />
-                </li>
-              </ol>
-              <p>
+            </h2>
+            <FormattedMessage
+              id="tfa_preferences_description"
+              defaultMessage="To configure Two Factor Authentication (2FA), you should link your account and the authentication app on your mobile device."
+            />
+            <ol>
+              <li>
                 <FormattedMessage
-                  id="tfa_preferences_reset"
-                  defaultMessage="If you need to reset your 2FA, you can do it by clicking the checkbox below, disabling 2FA, and then enabling it again."
+                  id="tfa_preferences_step1"
+                  defaultMessage="Enable Two Factor authentication using the checkbox below"
                 />
-              </p>
-            </Segment>
-          </Segment.Group>
-        </Container>
-        <p></p>
-        <Form
-          formData={this.props.user}
-          schema={this.state.schema}
-          onSubmit={this.onSubmit}
-          onCancel={this.onCancel}
-          onChangeFormData={this.onChangeFormData}
-          loading={this.props.updating}
-        ></Form>
-      </>
-    ) : (
-      <></>
-    );
-  }
+              </li>
+              <li>
+                <FormattedMessage
+                  id="tfa_preferences_step2"
+                  defaultMessage="Install an OTP app in your mobile device (e.g. Google Authenticator, Microsoft Authenticator, Authy, LastPass Authenticator, ...)"
+                />
+              </li>
+              <li>
+                <FormattedMessage
+                  id="tfa_preferences_step3"
+                  defaultMessage="Scan the QR code with your OTP app"
+                />
+              </li>
+              <li>
+                <FormattedMessage
+                  id="tfa_preferences_step4"
+                  defaultMessage="Enter the OTP code generated by the app in the OTP field below"
+                />
+              </li>
+              <li>
+                <FormattedMessage
+                  id="tfa_preferences_step5"
+                  defaultMessage="Click the confirm button. If the OTP code is correct, 2FA will be enabled. Next time you login, you will be asked for the OTP provided by your app."
+                />
+              </li>
+            </ol>
+            <p>
+              <FormattedMessage
+                id="tfa_preferences_reset"
+                defaultMessage="If you need to reset your 2FA, you can do it by clicking the checkbox below, disabling 2FA, and then enabling it again."
+              />
+            </p>
+          </Segment>
+        </Segment.Group>
+      </Container>
+      <p></p>
+      <Form
+        formData={user}
+        schema={schemaFactory(intl, enabled)}
+        onSubmit={onSubmit}
+        onCancel={onCancel}
+        onChangeFormData={onChangeFormData}
+        loading={updating}
+      ></Form>
+    </>
+  );
 }
 
-export default compose(
-  withRouter,
-  injectIntl,
-  connect(
-    (state, props) => ({
-      user: state.users.user,
-      userId: state.userSession.token
-        ? jwtDecode(state.userSession.token).sub
-        : '',
-      loaded: state.users.get.loaded,
-      loading: state.users.get.loading,
-      updated: state.users.update.loaded,
-      updating: state.users.update.loading,
-    }),
-    { getUser, updateUser },
-  ),
-)(Preferences);
+Preferences.propTypes = {
+  closeMenu: PropTypes.func,
+};
+
+export default injectLazyLibs(['toastify'])(Preferences);

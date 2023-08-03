@@ -61,6 +61,36 @@ msgstr "Clicca sul pulsante di conferma. Se il codice OTP è corretto, l'autenti
 msgid "otpChallenge"
 msgstr "Verifica OTP"
 
+#: components/Preferences/schemaFactory
+# defaultMessage: To configure Two Factor Authentication (2FA), you should link your account and the authentication app on your mobile device.
+msgid "tfaFormEnabledDescription"
+msgstr "Per configurare l'autenticazione a due fattori (2FA), devi collegare il tuo account e l'app di autenticazione sul tuo dispositivo mobile."
+
+#: components/Preferences/schemaFactory
+# defaultMessage: Two Factor Authentication
+msgid "tfaFormEnabledTitle"
+msgstr "Autenticazione a due fattori"
+
+#: components/Preferences/schemaFactory
+# defaultMessage: Enter the OTP code from your OTP app.
+msgid "tfaFormOtpDescription"
+msgstr "Inserisci il codice OTP dalla tua app OTP."
+
+#: components/Preferences/schemaFactory
+# defaultMessage: OTP
+msgid "tfaFormOtpTitle"
+msgstr "OTP"
+
+#: components/Preferences/schemaFactory
+# defaultMessage: Scan this QR code with your OTP app.
+msgid "tfaFormSecretDescription"
+msgstr "Scansiona questo codice QR con la tua app OTP."
+
+#: components/Preferences/schemaFactory
+# defaultMessage: Secret
+msgid "tfaFormSecretTitle"
+msgstr "Codice segreto"
+
 #: components/Preferences/Preferences
 # defaultMessage: OTP Preferences
 msgid "tfaPreferences"
