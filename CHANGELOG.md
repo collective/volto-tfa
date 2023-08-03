@@ -1,5 +1,12 @@
 
 
+## [0.1.3](https://github.com/collective/volto-tfa/compare/v0.1.2...v0.1.3) (2023-08-03)
+
+
+### Bug Fixes
+
+* login process ([d7c7362](https://github.com/collective/volto-tfa/commit/d7c73620a86c4af540b2080dab03c445d45d234d))
+
 ## [0.1.2](https://github.com/collective/volto-tfa/compare/v0.1.1...v0.1.2) (2023-08-02)
 
 
