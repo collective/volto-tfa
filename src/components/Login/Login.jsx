@@ -206,11 +206,13 @@ function TFALogin(props) {
         );
       }
     }
+  }, [token, history, returnUrl, toast, loginState.error, intl]);
 
+  useEffect(() => {
     return () => {
       dispatch(cancel());
     };
-  }, [dispatch, token, history, returnUrl, toast, loginState.error, intl]);
+  }, [dispatch]);
 
   switch (otpChallenge.action) {
     case 'add':
