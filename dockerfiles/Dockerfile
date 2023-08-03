@@ -25,7 +25,7 @@ EOT
 FROM plone/frontend-prod-config:${VOLTO_VERSION}
 
 LABEL maintainer="Plone Collective" \
-      org.label-schema.name="ghcr.io/collective/voltotfa" \
+      org.label-schema.name="ghcr.io/collective/volto-tfa" \
       org.label-schema.description="Volto project with @plone-collective/volto-tfa" \
       org.label-schema.vendor="Plone Collective"
 

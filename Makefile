@@ -137,7 +137,7 @@ debug-frontend:  ## Run bash in the Frontend container (for debug infrastructure
 
 .PHONY: pull-backend-image
 pull-backend-image:  ## Pulls and updates the backend image (for use it while developing)
-	docker pull ghcr.io/collective/voltotfa:latest
+	docker pull ghcr.io/collective/volto-tfa:latest
 
 .PHONY: release
 release:  ## Release a version of the add-on

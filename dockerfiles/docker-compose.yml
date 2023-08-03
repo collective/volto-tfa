@@ -18,8 +18,8 @@ services:
       # RAZZLE_INTERNAL_API_PATH: http://host.docker.internal:8080/Plone
       RAZZLE_API_PATH: http://127.0.0.1:8080/Plone
       HOST: 0.0.0.0
-    depends_on:
-      - backend
+    # depends_on:
+    #   - backend
     ports:
       - 3000:3000
       - 3001:3001
@@ -45,7 +45,7 @@ services:
       - live
 
   backend:
-    image: ghcr.io/collective/voltotfa:latest
+    image: ghcr.io/collective/volto-tfa:latest
     environment:
       CORS_: true
     ports:
