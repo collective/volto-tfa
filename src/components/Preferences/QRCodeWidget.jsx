@@ -21,6 +21,9 @@ export const QRCodeWidget = ({
     state.userSession.token ? jwtDecode(state.userSession.token).sub : '',
   );
   const [secret, setSecret] = useState();
+  const site_title = useSelector((state) =>
+    state.site.data['plone.site_title']
+  );
 
   useEffect(() => {
     const secret = encode(Math.random().toString(36))
@@ -43,7 +46,7 @@ export const QRCodeWidget = ({
         */}
           <QRCodeSVG
             size={200}
-            value={`otpauth://totp/${userId}@${window.location.hostname}?secret=${secret}`}
+            value={`otpauth://totp/${userId}@${window.location.hostname}?secret=${secret}&issuer=${site_title}`}
           />
           <input
             type="hidden"
