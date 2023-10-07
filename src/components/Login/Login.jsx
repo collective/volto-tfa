@@ -35,6 +35,10 @@ const messages = defineMessages({
     id: 'Cancel',
     defaultMessage: 'Cancel',
   },
+  loginFailedContent: {
+    id: 'The OTP you entered was not valid',
+    defaultMessage: 'The OTP you entered was not valid',
+  },
 });
 
 const AddTFA = () => {
@@ -200,7 +204,7 @@ function TFALogin(props) {
           <Toast
             error
             title={intl.formatMessage(messages.loginFailed)}
-            content={JSON.stringify(loginState.error)}
+            content={intl.formatMessage(messages.loginFailedContent)}
           />,
           { autoClose: false, toastId: 'loginFailed' },
         );
