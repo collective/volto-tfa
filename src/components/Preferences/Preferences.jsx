@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link, useHistory } from 'react-router-dom';
 import { Container, Segment } from 'semantic-ui-react';
 import { getUser, updateUser } from '@plone/volto/actions';
+import { usePrevious } from '@plone/volto/helpers';
 import { Form, Icon, Toast } from '@plone/volto/components';
 import { Plug } from '@plone/volto/components/manage/Pluggable';
 import { injectLazyLibs } from '@plone/volto/helpers/Loadable/Loadable';
@@ -44,6 +45,7 @@ function Preferences({ closeMenu, toastify }) {
   );
   const updated = useSelector((state) => state.users.update.loaded);
   const updating = useSelector((state) => state.users.update.loading);
+  const error = useSelector((state) => state.users.update.error);
 
   const [enabled, setEnabled] = useState(false);
 
@@ -51,6 +53,7 @@ function Preferences({ closeMenu, toastify }) {
     dispatch(getUser(userId));
   }, [dispatch, userId]);
 
+  const prevUpdating = usePrevious(updating);
   useEffect(() => {
     if (updated) {
       toast.success(
@@ -65,6 +68,22 @@ function Preferences({ closeMenu, toastify }) {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [updated]);
+
+  useEffect(() => {
+    if (prevUpdating && error) {
+      toast.error(
+        <Toast
+          error
+          title={intl.formatMessage({ id: 'Error' })}
+          content={intl.formatMessage({
+            id: 'InvalidOTP',
+            defaultMessage: error.response.body.error.message,
+          })}
+        />,
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [prevUpdating, error]);
 
   function onChangeFormData(data) {
     setEnabled(!!data.two_factor_authentication_enabled);
