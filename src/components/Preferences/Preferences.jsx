@@ -85,6 +85,22 @@ function Preferences({ closeMenu, toastify }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [prevUpdating, error]);
 
+  useEffect(() => {
+    if (prevUpdating && error) {
+      toast.error(
+        <Toast
+          error
+          title={intl.formatMessage({ id: 'Error' })}
+          content={intl.formatMessage({
+            id: 'InvalidOTP',
+            defaultMessage: error.response.body.error.message,
+          })}
+        />,
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [prevUpdating, error]);
+
   function onChangeFormData(data) {
     setEnabled(!!data.two_factor_authentication_enabled);
   }
