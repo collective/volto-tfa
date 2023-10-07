@@ -55,7 +55,7 @@ function Preferences({ closeMenu, toastify }) {
 
   const prevUpdating = usePrevious(updating);
   useEffect(() => {
-    if (updated) {
+    if (prevUpdating && updated) {
       toast.success(
         <Toast
           success
@@ -67,7 +67,7 @@ function Preferences({ closeMenu, toastify }) {
       else history.goBack();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [updated]);
+  }, [prevUpdating, updated]);
 
   useEffect(() => {
     if (prevUpdating && error) {
